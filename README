@@ -1,0 +1,52 @@
+ motifScan: TODO add a program descripton here!!!
+
+ Created by Lincoln Harris
+ Swarthmore College
+ June 2016
+
+CONFIGURE 
+	download source code as a tar/zip 
+	untar/unzip to create motifScan directory
+	(alternatively) use git clone to create motifScan directory
+	cd into /motifScan dir
+	type 'make'
+
+INPUT
+   refSeq - reference sequence file, in FASTA format (can be specified as a compete path)
+   querySeq - query sequence file, in FASTA format (can be specified as a complete path)
+   mot1 - first motif to search for 
+   mot2 - second motif to search for 
+   winSize - allowable sequence gap between two motifs
+   revComp Y/N - if ON, program will look for motifClusters with reverse complements
+                 of the input motifs, in addition to the motifs as entered
+                 (O configures OFF, 1 configures ON)
+   wobbleBase Y/N - if ON, tells program to look for motifs in accordance to the 
+                    conventional base pair wobble rules:
+                         W -> "A,T"
+                         S -> "C,G"
+                         K -> "G,T"
+                         M -> "A,C"
+                         Y -> "C,T"
+                         R -> "A,G"
+                         N -> "A,C,G,T" //still not working!!!
+                    (O configures OFF, 1 configures ON)
+
+EXAMPLE 
+	./motifScan myFile1.fasta myFile2.fasta GGAT ATTA 20 1 0
+
+	Will search myFile1 and myFile 2 for conserved binding site clusters containing both
+	GGAT and ATTA motifs within a 20 base pair window. Will also search for conserved 
+	clusters containing the reverse complements, CCTA and TAAT
+
+SEARCH ALGORITHM 
+ 	1. scan refSeq for mot1
+       	record location, call it mot1_found
+ 	2. look for mot2 w/in range of +/- winSize of mot1_found on refSeq
+        record location, call it mot2_found
+ 	3. if mot2_found on refSeq:
+ 	    go to mot1_found on querySeq
+ 	    is mot1 there (or within +/- winSize) on querySeq?
+ 	        if not, go to step 4
+ 	        if yes, scan for mot2 w/in range of +/- winSize of mot2_found on querySeq
+ 	        	output mot1_found 
+ 	4. else, back up to step 1, continue scanning from mot1_found on refSeq
